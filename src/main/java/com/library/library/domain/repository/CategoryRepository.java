@@ -3,5 +3,8 @@ package com.library.library.domain.repository;
 import com.library.library.domain.models.Category;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface CategoryRepository extends MongoRepository<String, Category> {
+import java.util.Optional;
+
+public interface CategoryRepository extends MongoRepository<Category, String> {
+    Optional<Category> findByCategoryName(String categoryName);
 }
