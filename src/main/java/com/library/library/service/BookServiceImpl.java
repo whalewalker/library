@@ -6,10 +6,12 @@ import com.library.library.domain.repository.AuthorRepository;
 import com.library.library.domain.repository.BookRepository;
 import com.library.library.domain.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class BookServiceImpl implements BookService{
     @Autowired
     BookRepository bookRepository;
@@ -32,12 +34,17 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public Book saveBook(BookDto bookDto) {
+    public Book uploadBook(BookDto bookDto) {
+
         return null;
     }
 
     @Override
     public Book updateBook(String bookId, BookDto bookDto) {
+        if (bookDto  == null) throw new NullPointerException("Book cannot be null");
+        Book book = new Book();
+
+
         return null;
     }
 
