@@ -1,7 +1,7 @@
 package com.library.library.web.security;
 
-import com.library.library.web.exceptions.UserPrincipal;
 import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class JwtTokenProvider {
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
@@ -21,7 +22,8 @@ public class JwtTokenProvider {
     private int jwtExpirationInMs;
 
     public String generateToken(Authentication authentication){
-        UserPrincipal userPrincipal = (UserPrincipal) authentication;
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
@@ -30,9 +32,10 @@ public class JwtTokenProvider {
                 .setSubject(userPrincipal.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }
+
 
     public String getAuthorIdFromJWT(String token){
         Claims claims = Jwts.parser()

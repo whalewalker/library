@@ -1,7 +1,7 @@
 package com.library.library.domain.models;
 
 import lombok.Data;
-import org.springframework.data.annotation.CreatedBy;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -11,26 +11,26 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Document
 @Data
+@NoArgsConstructor
 public class Author{
     @Id
     private String id;
 
-    private String firstName;
-
-    private String lastName;
+    private String fullName;
 
     private String profession;
 
     @CreatedDate
-    private LocalDateTime datePublished;
+    private LocalDate datePublished;
 
     @LastModifiedDate
-    private LocalDateTime dateModified;
+    private LocalDate dateModified;
 
     @NotBlank
     @Size(min = 4, max = 50)
@@ -48,15 +48,19 @@ public class Author{
     private Address address;
 
     @DBRef
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
 
     @DBRef
-    private List<Book> books;
+    private List<Book> books = new ArrayList<>();
 
     @DBRef
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 
 
-
-
+    public Author(String fullName, String username, String email, String password) {
+        this.username = username;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+    }
 }
