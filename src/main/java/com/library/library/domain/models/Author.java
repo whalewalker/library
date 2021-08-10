@@ -40,6 +40,8 @@ public class Author{
     @Size(min = 8, max = 50)
     private String email;
 
+    @NotBlank
+    private String password;
 
     private String phoneNumber;
 
