@@ -13,7 +13,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Document
 @Data
@@ -54,7 +56,7 @@ public class Author{
     private List<Book> books = new ArrayList<>();
 
     @DBRef
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
 
 
     public Author(String fullName, String username, String email, String password) {
