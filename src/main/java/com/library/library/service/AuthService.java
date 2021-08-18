@@ -14,4 +14,5 @@ public interface AuthService {
     AuthToken login(LoginDto loginDto) throws AuthUserException;
     Token generatePasswordResetToken(String username) throws AuthUserException;
     void resetUserPassword(PasswordResetRequest request, String token) throws AuthUserException, TokenException;
+    boolean verify(String token) throws AuthUserException;
 }

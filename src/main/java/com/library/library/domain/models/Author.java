@@ -34,6 +34,10 @@ public class Author{
     @LastModifiedDate
     private LocalDate dateModified;
 
+    private boolean isActive;
+
+    private String verificationToken;
+
     @NotBlank
     @Size(min = 4, max = 50)
     private String username;

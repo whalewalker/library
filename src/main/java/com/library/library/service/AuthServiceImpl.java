@@ -3,6 +3,7 @@ package com.library.library.service;
 import com.library.library.domain.dto.LoginDto;
 import com.library.library.domain.dto.RegisterDto;
 import com.library.library.domain.models.Author;
+import com.library.library.domain.models.Mail;
 import com.library.library.domain.models.Role;
 import com.library.library.domain.repository.AuthorRepository;
 import com.library.library.domain.repository.RoleRepository;
@@ -17,6 +18,7 @@ import com.library.library.web.security.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -58,6 +60,9 @@ public class AuthServiceImpl implements AuthService{
     @Autowired
     TokenRepository tokenRepository;
 
+    @Autowired
+    MailService mailService;
+
 
     @PostConstruct
     void setUp(){
@@ -88,8 +93,26 @@ public class AuthServiceImpl implements AuthService{
         Role userRole = roleRepository.findByRoleName(USER).orElseThrow(() -> new AppException("Author role is not set"));
         author.getRoles().add(userRole);
 
+        String uniqueToken = UUID.randomUUID().toString();
+        author.setVerificationToken(uniqueToken);
+
         Author createdAuthor = authorRepository.save(author);
+
+        Mail mail = new Mail();
+        String link = "http://localhost:8080/api/auth/verify?token=";
+        mail.setMailTo(createdAuthor.getEmail());
+        mail.setMailSubject("Mail Confirmation Link!");
+        mail.setMailContent("Thank you for registering. Please click on the below link to activate your account." + link + author.getVerificationToken());
+
+        mailService.sendMail(mail);
         return modelMapper.map(author, RegisterDto.class);
+    }
+
+    public boolean verify(String verificationToken) throws AuthUserException {
+        Author author = authorRepository.findByVerificationToken(verificationToken).orElseThrow(()-> new AuthUserException("No user with this verification token"));
+        author.setActive(true);
+        authorRepository.save(author);
+        return true;
     }
 
     @Override

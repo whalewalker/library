@@ -13,6 +13,7 @@ import com.library.library.web.payloads.PasswordResetRequest;
 import com.library.library.web.payloads.Token;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -78,6 +79,21 @@ public class AuthController {
             return new ResponseEntity<>(new ApiResponse(false, exception.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyUser(@Param("token") String token){
+        try {
+           authService.verify(token);
+                return new ResponseEntity<>(new ApiResponse(true, "User is verified"), HttpStatus.OK);
+
+        } catch (AuthUserException e) {
+            return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+
+
 
 
 }
