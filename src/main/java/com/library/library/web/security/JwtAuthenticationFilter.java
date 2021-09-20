@@ -1,5 +1,6 @@
 package com.library.library.web.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenProvider tokenProvider;
@@ -31,14 +34,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String jwt = getJwtFromRequest(httpServletRequest);
+            String jwt = Objects.requireNonNull(getJwtFromRequest(httpServletRequest)).substring(0, 7);
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)){
                 String authorId = tokenProvider.getAuthorIdFromJWT(jwt);
 
                 UserDetails userDetails = customUserDetailsService.loadUserById(authorId);
+                log.info("userDetials --> {}", userDetails);
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-
+                log.info("authToken-->{}", authenticationToken);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }catch (Exception e){
@@ -50,6 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")){
+            log.info("Bearer token --> {}", bearerToken);
             return bearerToken;
         }
         return null;

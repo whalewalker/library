@@ -15,9 +15,7 @@ import java.util.stream.Collectors;
 @Data
 @AllArgsConstructor
 public class UserPrincipal implements UserDetails {
-
     private String id;
-    private String name;
     private String username;
 
     @JsonIgnore
@@ -29,18 +27,18 @@ public class UserPrincipal implements UserDetails {
 
     public static UserPrincipal create(Author author)  {
         List<GrantedAuthority> authorities = author.getRoles().stream().map(role ->
-                        new SimpleGrantedAuthority(role.getRoleName().name()))
+                        new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toList());
 
         return new UserPrincipal(
                 author.getId(),
-                author.getFullName(), author.getUsername(),
+                author.getUsername(),
                 author.getEmail(), author.getPassword(),
                 authorities);
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return authorities;
     }
 
     @Override

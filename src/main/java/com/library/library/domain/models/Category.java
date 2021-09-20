@@ -16,8 +16,6 @@ public class Category {
 
     private List<Book> bookCategory;
 
-    private List<Post> postCategory;
-
     private List<Author> authorCategory;
 
 }

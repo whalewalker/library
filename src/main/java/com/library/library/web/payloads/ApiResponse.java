@@ -16,6 +16,5 @@ public class ApiResponse {
                 this.isSuccessful = isSuccessful;
                 this.message = message;
                 timeStamp = LocalDateTime.now();
-
         }
 }

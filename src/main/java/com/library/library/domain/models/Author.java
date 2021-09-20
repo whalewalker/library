@@ -1,5 +1,7 @@
 package com.library.library.domain.models;
 
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,52 +22,26 @@ import java.util.Set;
 @Document
 @Data
 @NoArgsConstructor
-public class Author{
+@AllArgsConstructor
+public class Author {
     @Id
     private String id;
-
-    private String fullName;
-
-    private String profession;
-
+    private boolean isActive;
+    private String verificationToken;
+    private String username;
+    private String email;
+    private String password;
+    private String phoneNumber;
+    @DBRef
+    private List<Book> books = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
     @CreatedDate
     private LocalDate datePublished;
-
     @LastModifiedDate
     private LocalDate dateModified;
 
-    private boolean isActive;
-
-    private String verificationToken;
-
-    @NotBlank
-    @Size(min = 4, max = 50)
-    private String username;
-
-    @Email(message = "Email cannot be null")
-    @Size(min = 8, max = 50)
-    private String email;
-
-    @NotBlank
-    private String password;
-
-    private String phoneNumber;
-
-    private Address address;
-
-    @DBRef
-    private List<Post> posts = new ArrayList<>();
-
-    @DBRef
-    private List<Book> books = new ArrayList<>();
-
-    @DBRef
-    private Set<Role> roles = new HashSet<>();
-
-
-    public Author(String fullName, String username, String email, String password) {
+    public Author(String username, String email, String password) {
         this.username = username;
-        this.fullName = fullName;
         this.email = email;
         this.password = password;
     }

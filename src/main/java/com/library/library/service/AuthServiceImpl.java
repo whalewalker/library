@@ -1,14 +1,11 @@
 package com.library.library.service;
 
+import com.library.library.domain.dto.AuthorDto;
 import com.library.library.domain.dto.LoginDto;
-import com.library.library.domain.dto.RegisterDto;
 import com.library.library.domain.models.Author;
-import com.library.library.domain.models.Mail;
 import com.library.library.domain.models.Role;
 import com.library.library.domain.repository.AuthorRepository;
-import com.library.library.domain.repository.RoleRepository;
 import com.library.library.domain.repository.TokenRepository;
-import com.library.library.web.exceptions.AppException;
 import com.library.library.web.exceptions.AuthUserException;
 import com.library.library.web.exceptions.TokenException;
 import com.library.library.web.payloads.AuthToken;
@@ -17,8 +14,8 @@ import com.library.library.web.payloads.Token;
 import com.library.library.web.security.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,90 +23,73 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import static com.library.library.domain.models.RoleName.ADMIN;
-import static com.library.library.domain.models.RoleName.USER;
 
 @Service
 @Slf4j
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
+    private final AuthorRepository authorRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    private final ModelMapper modelMapper = new ModelMapper();
+
 
     @Autowired
-    AuthorRepository authorRepository;
+    private JwtTokenProvider tokenProvider;
 
     @Autowired
-    RoleRepository roleRepository;
+    private TokenRepository tokenRepository;
+    @Autowired
+    private MailService mailService;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    JwtTokenProvider tokenProvider;
-
-    @Autowired
-    ModelMapper modelMapper;
-
-    @Autowired
-    TokenRepository tokenRepository;
-
-    @Autowired
-    MailService mailService;
-
-
-    @PostConstruct
-    void setUp(){
-        Role role = new Role();
-        role.setId("001");
-        role.setRoleName(USER);
-        Role role1 = new Role();
-        role1.setId("002");
-        role1.setRoleName(ADMIN);
-        List<Role> roleList = new ArrayList<>();
-        roleList.add(role);
-        roleList.add(role1);
-        log.info("Saving roles ....");
-        roleRepository.saveAll(roleList);
+    public AuthServiceImpl(AuthorRepository authorRepository, PasswordEncoder passwordEncoder) {
+        this.authorRepository = authorRepository;
+        this.passwordEncoder = passwordEncoder;
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
     }
 
 
     @Override
-    public RegisterDto register(RegisterDto registerDto) throws AuthUserException {
-       if (authorRepository.existsByUsername(registerDto.getUsername())){
-           throw new AuthUserException("Username is already taken");
-       }
-       if (authorRepository.existsByEmail(registerDto.getEmail())){
-           throw new AuthUserException("Email is already in use");
-       }
+    public Author registerUser(AuthorDto registerDto) throws AuthUserException {
+        if (existByUsername(registerDto.getUsername())) {
+            throw new AuthUserException("Username is already taken");
+        }
+        if (existByEmail(registerDto.getEmail())) {
+            throw new AuthUserException("Email is already in use");
+        }
+        Author newAuthor = modelMapper.map(registerDto, Author.class);
+        log.info("User to save ==> {}", newAuthor);
+        newAuthor.getRoles().add(Role.USER);
+        newAuthor.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+        newAuthor.setVerificationToken(UUID.randomUUID().toString());
+        Author savedAuthor = authorRepository.save(newAuthor);
 
-        Author author = new Author(registerDto.getName(), registerDto.getUsername(), registerDto.getEmail(), passwordEncoder.encode(registerDto.getPassword()));
-        Role userRole = roleRepository.findByRoleName(USER).orElseThrow(() -> new AppException("Author role is not set"));
-        author.getRoles().add(userRole);
+//        Mail mail = new Mail();
+//        String link = "http://localhost:8080/api/auth/verify?token=";
+//        mail.setMailTo(savedAuthor.getEmail());
+//        mail.setMailSubject("Mail Confirmation Link!");
+//        mail.setMailContent("Thank you for registering. Please click on the below link to activate your account." + link + savedAuthor.getVerificationToken());
+//
+//        mailService.sendMail(mail);
+        return savedAuthor;
+    }
 
-        String uniqueToken = UUID.randomUUID().toString();
-        author.setVerificationToken(uniqueToken);
+    private boolean existByEmail(String email) {
+        return authorRepository.existsByEmail(email);
+    }
 
-        Author createdAuthor = authorRepository.save(author);
-
-        Mail mail = new Mail();
-        String link = "http://localhost:8080/api/auth/verify?token=";
-        mail.setMailTo(createdAuthor.getEmail());
-        mail.setMailSubject("Mail Confirmation Link!");
-        mail.setMailContent("Thank you for registering. Please click on the below link to activate your account." + link + author.getVerificationToken());
-
-        mailService.sendMail(mail);
-        return modelMapper.map(author, RegisterDto.class);
+    private boolean existByUsername(String username) {
+        return authorRepository.existsByUsername(username);
     }
 
     public boolean verify(String verificationToken) throws AuthUserException {
-        Author author = authorRepository.findByVerificationToken(verificationToken).orElseThrow(()-> new AuthUserException("No user with this verification token"));
+        Author author = authorRepository.findByVerificationToken(verificationToken).orElseThrow(() -> new AuthUserException("No user with this verification token"));
         author.setActive(true);
         authorRepository.save(author);
         return true;
@@ -126,13 +106,13 @@ public class AuthServiceImpl implements AuthService{
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.generateToken(authentication);
-        Author author = authorRepository.findByUsername(loginDto.getUsernameOrEmail()).orElseThrow(()-> new AuthUserException("User with this username does not exist!"));
+        Author author = authorRepository.findByUsername(loginDto.getUsernameOrEmail()).orElseThrow(() -> new AuthUserException("User with this username does not exist!"));
         return new AuthToken(jwt, author.getId());
     }
 
     @Override
     public Token generatePasswordResetToken(String username) throws AuthUserException {
-        Author author = authorRepository.findByUsername(username).orElseThrow(()-> new AuthUserException(String.format("User with %s username does not exist!", username)));
+        Author author = authorRepository.findByUsername(username).orElseThrow(() -> new AuthUserException(String.format("User with %s username does not exist!", username)));
         Token token = new Token();
         token.setToken(UUID.randomUUID().toString());
         token.setUser(author);
@@ -146,7 +126,7 @@ public class AuthServiceImpl implements AuthService{
         String newPassword = request.getNewPassword();
 
         Author authorToResetPassword = authorRepository.findByUsername(username).orElseThrow(() -> new AuthUserException(String.format("User with %s does not exist", username)));
-        Token token = tokenRepository.findByToken(resetToken).orElseThrow(()-> new TokenException(String.format("No token with value %s found", resetToken)));
+        Token token = tokenRepository.findByToken(resetToken).orElseThrow(() -> new TokenException(String.format("No token with value %s found", resetToken)));
 
         if(token.getExpiryTimeStamp().isBefore(LocalDateTime.now())) throw new TokenException("This password reset token has expired");
         if (!token.getUser().getId().equals(authorToResetPassword.getId())) throw new TokenException("password token does not belong to this user");

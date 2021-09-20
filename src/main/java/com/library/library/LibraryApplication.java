@@ -4,16 +4,15 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.library.library.web.config.CloudinaryConfig;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
-
-import javax.sql.DataSource;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @SpringBootApplication
-@EnableMongoAuditing
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class LibraryApplication {
 
     @Autowired
@@ -33,7 +32,9 @@ public class LibraryApplication {
     }
 
     @Bean
-    ModelMapper modelMapper(){
-        return new ModelMapper();
+    ModelMapper modelMapper() {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setSkipNullEnabled(true);
+        return mapper;
     }
 }

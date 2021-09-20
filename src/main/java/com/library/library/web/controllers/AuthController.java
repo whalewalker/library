@@ -1,9 +1,8 @@
 package com.library.library.web.controllers;
 
+import com.library.library.domain.dto.AuthorDto;
 import com.library.library.domain.dto.LoginDto;
-import com.library.library.domain.dto.RegisterDto;
-import com.library.library.domain.models.Role;
-import com.library.library.domain.repository.RoleRepository;
+import com.library.library.domain.models.Author;
 import com.library.library.service.AuthService;
 import com.library.library.web.exceptions.AuthUserException;
 import com.library.library.web.exceptions.TokenException;
@@ -18,30 +17,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.library.library.domain.models.RoleName.ADMIN;
-import static com.library.library.domain.models.RoleName.USER;
 
 @RestController
 @Slf4j
-@RequestMapping("api/auth")
+@CrossOrigin(origins = "*", maxAge = 3600)
+@RequestMapping("api/v1/auth")
 public class AuthController {
 
     @Autowired
     AuthService authService;
 
-    @Autowired
-    RoleRepository roleRepository;
-
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterDto registerDto){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody AuthorDto authorDto) {
         try {
-            RegisterDto createdAuthor = authService.register(registerDto);
+            Author createdAuthor = authService.registerUser(authorDto);
             return new ResponseEntity<>(createdAuthor, HttpStatus.OK);
         } catch (AuthUserException e) {
             return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);

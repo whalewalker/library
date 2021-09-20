@@ -6,12 +6,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotBlank;
 
-@Data
-@Document
-public class Role {
-    @Id
-    private String id;
-
-    @NotBlank
-    private RoleName roleName;
+public enum Role {
+    USER, ADMIN
 }

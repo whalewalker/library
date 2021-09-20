@@ -1,6 +1,6 @@
 package com.library.library.web.security;
 
-import com.library.library.domain.models.Author;
+import com.library.library.domain.models.Author;;
 import com.library.library.domain.repository.AuthorRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +44,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Author author = authorRepository.findById(id).orElseThrow(()->
             new UsernameNotFoundException("Author not found with id: " + id)
         );
+
         return UserPrincipal.create(author);
     }
 }
