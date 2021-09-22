@@ -2,7 +2,10 @@ package com.library.library.web.controllers;
 
 
 import com.library.library.domain.dto.AuthorDto;
+import com.library.library.domain.dto.BookDto;
 import com.library.library.domain.models.Author;
+import com.library.library.domain.models.Book;
+import com.library.library.service.BookService;
 import com.library.library.service.UserService;
 import com.library.library.web.exceptions.UserException;
 import com.library.library.web.payloads.ApiResponse;
@@ -14,6 +17,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -25,6 +30,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    BookService bookService;
 
     @GetMapping("user/{username}")
     public ResponseEntity<?> getUserWithUsername(@PathVariable String username) {
@@ -70,6 +78,17 @@ public class UserController {
     public ResponseEntity<?> getAllUsers() {
         List<Author> authors = userService.getAllUsers();
         return new ResponseEntity<>(authors, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_USER')")
+    @PostMapping("/{userId}/books")
+    public ResponseEntity<?> uploadBook(@PathVariable String userId, @Valid @RequestBody BookDto bookDto){
+        try {
+            Book book = bookService.uploadBook(userId, bookDto);
+            return new ResponseEntity<>(book, HttpStatus.CREATED);
+        } catch (IOException | UserException e) {
+           return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

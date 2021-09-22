@@ -7,12 +7,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class CloudinaryConfig {
-    @Value("${CLOUD_NAME}")
+    @Value("${app.CLOUD_NAME}")
     private String cloudName;
-
-    @Value("${API_KEY")
+    @Value("${app.API_KEY}")
     private String apiKey;
-
-    @Value("${API_SECRET}")
+    @Value("${app.API_SECRET}")
     private String apiSecret;
 }

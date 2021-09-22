@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthorDto updateAuthorProfile(String authorId, AuthorDto authorDto) {
+    public AuthorDto updateAuthorProfile(String authorId, AuthorDto authorDto) throws UserException {
         Author authorToUpdate = authorRepository.findById(authorId).orElseThrow(
                 () -> new UserException(String.format("User with this id %s does not exist", authorId)));
 
