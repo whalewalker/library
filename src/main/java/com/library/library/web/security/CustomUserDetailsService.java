@@ -24,9 +24,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info(usernameOrEmail);
         log.info("load method called ...");
         Optional<Author> author = authorRepository.findByUsername(usernameOrEmail);
+        log.info("username empty ==> {}", author);
         if(author.isEmpty()) {
-            log.info("username empty");
+            log.info("username empty ==> {}", author);
             author = authorRepository.findByEmail(usernameOrEmail);
+            log.info("username empty find by email ==> {}", author);
         }
         if(author.isPresent()){
             log.info("email valid...");
@@ -44,7 +46,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         Author author = authorRepository.findById(id).orElseThrow(()->
             new UsernameNotFoundException("Author not found with id: " + id)
         );
-
         return UserPrincipal.create(author);
     }
 }
