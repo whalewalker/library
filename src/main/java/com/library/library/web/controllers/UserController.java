@@ -71,4 +71,5 @@ public class UserController {
         List<Author> authors = userService.getAllUsers();
         return new ResponseEntity<>(authors, HttpStatus.OK);
     }
+
 }
