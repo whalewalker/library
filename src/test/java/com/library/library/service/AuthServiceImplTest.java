@@ -8,6 +8,7 @@ import com.library.library.web.exceptions.AuthUserException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -20,7 +21,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class AuthServiceImplTest {
@@ -48,11 +49,12 @@ class AuthServiceImplTest {
     @Test
     void whenRegisterUserMethodIsCalled_theUserRepositorySaveMethodIsCalledOnce() throws AuthUserException {
         AuthorDto registerDto = new AuthorDto("sam", "sma@gmail.com", "password");
-        when(authorRepository.save(any(Author.class))).thenReturn(authorTest);
-        Author savedAuthor = authService.registerUser(registerDto);
+        authService.registerUser(registerDto);
+        verify(authorRepository, times(1)).existsByEmail(registerDto.getEmail());
+        verify(authorRepository, times(1)).existsByUsername(registerDto.getUsername());
+        ArgumentCaptor<Author> authorArgumentCaptor = ArgumentCaptor.forClass(Author.class);
+        verify(authorRepository, times(1)).save(authorArgumentCaptor.capture());
+        Author savedAuthor = authorArgumentCaptor.getValue();
         assertThat(savedAuthor).isNotNull();
-        verify(authorRepository).existsByEmail(registerDto.getEmail());
-        verify(authorRepository).existsByUsername(registerDto.getUsername());
-        verify(authorRepository).save(new Author());
     }
 }

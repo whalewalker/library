@@ -68,7 +68,6 @@ public class AuthServiceImpl implements AuthService {
         newAuthor.getRoles().add(Role.USER);
         newAuthor.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         newAuthor.setVerificationToken(UUID.randomUUID().toString());
-        Author savedAuthor = authorRepository.save(newAuthor);
 
 //        Mail mail = new Mail();
 //        String link = "http://localhost:8080/api/auth/verify?token=";
@@ -77,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
 //        mail.setMailContent("Thank you for registering. Please click on the below link to activate your account." + link + savedAuthor.getVerificationToken());
 //
 //        mailService.sendMail(mail);
-        return savedAuthor;
+        return authorRepository.save(newAuthor);
     }
 
     private boolean existByEmail(String email) {
