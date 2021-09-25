@@ -20,57 +20,59 @@ import java.util.*;
 @Service
 @Slf4j
 public class BookServiceImpl implements BookService{
-    @Autowired
-    BookRepository bookRepository;
-
-    @Autowired
-    AuthorRepository authorRepository;
-
-    @Autowired
-    CategoryRepository categoryRepository;
-
-    @Autowired
-    CloudStorageService cloudStorageService;
-
-
-    @Override
-    public Optional<Book> getBookByTitle(String title) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Book> getAllBooks() {
-        return null;
-    }
-
-    @Override
-    public Book uploadBook(String authorId, BookDto bookDto) throws IOException, UserException {
-
-        Author author = authorRepository.findById(authorId).orElseThrow(
-                () -> new UserException(String.format("User with this id %s does not exist", authorId)));
-
-        if (bookDto  == null) throw new NullPointerException("Book cannot be null");
-        Book book = new Book();
-        if (bookDto.getPdfFile() != null){
-            cloudStorageService.extractCoverImage(bookDto.getPdfFile());
-
-            File file = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/Pdf.png");
-
-            Map<?, ?> uploadedCoverImage = cloudStorageService.uploadPdf(file, ObjectUtils.asMap(
-                    "public_id", "pdf-cover-image", "overwrite", true
-            ));
-            book.setCoverImage(String.valueOf(uploadedCoverImage.get("url")));
-            Map<?, ?> uploadResult =  cloudStorageService.uploadPdf(bookDto.getPdfFile(), ObjectUtils.asMap(
-                    "public_id", "library"
-            ));
-            book.setBookUrl((String.valueOf(uploadResult.get("url"))));
-            book.setTitle(String.valueOf(uploadedCoverImage.get("original_filename")));
-            book.setPublisher(bookDto.getPublisher());
-            book.setDescription(bookDto.getDescription());
-            book.getAuthors().add(author);
-        }
-        return book;
-    }
+//    @Autowired
+//    BookRepository bookRepository;
+//
+//    @Autowired
+//    AuthorRepository authorRepository;
+//
+//    @Autowired
+//    CategoryRepository categoryRepository;
+//
+//    @Autowired
+//    CloudStorageService cloudStorageService;
+//
+//
+//    @Override
+//    public Optional<Book> getBookByTitle(String title) {
+//        return Optional.empty();
+//    }
+//
+//    @Override
+//    public List<Book> getAllBooks() {
+//        return null;
+//    }
+//
+//    @Override
+//    public Book uploadBook(String authorId, BookDto bookDto) throws IOException, UserException {
+//
+//        Author author = authorRepository.findById(authorId).orElseThrow(
+//                () -> new UserException(String.format("User with this id %s does not exist", authorId)));
+//
+//        if (bookDto  == null) throw new NullPointerException("Book cannot be null");
+//        Book book = new Book();
+//        if (bookDto.getPdfFile() != null){
+//            cloudStorageService.extractCoverImage(bookDto.getPdfFile());
+//
+//            File file = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/Pdf.png");
+//
+//            Map<?, ?> uploadedCoverImage = cloudStorageService.uploadPdf(file, ObjectUtils.asMap(
+//                    "public_id", "pdf-cover-image", "overwrite", true
+//            ));
+//            book.setCoverImage(String.valueOf(uploadedCoverImage.get("url")));
+//            Map<?, ?> uploadResult =  cloudStorageService.uploadPdf(bookDto.getPdfFile(), ObjectUtils.asMap(
+//                    "public_id", "library"
+//            ));
+//            book.setBookUrl((String.valueOf(uploadResult.get("url"))));
+//            book.setTitle(String.valueOf(uploadedCoverImage.get("original_filename")));
+//            book.setPublisher(bookDto.getPublisher());
+//            book.setDescription(bookDto.getDescription());
+//            book.getAuthors().add(author);
+//            book.setPublisher(author.getUsername());
+//
+//        }
+//        return book;
+//    }
 
 //    private Map<File, Map<?, ?>> imageToUploadData(){
 //
@@ -80,10 +82,10 @@ public class BookServiceImpl implements BookService{
 //        return new HashMap<>(file, params);
 //    }
 
-    @Override
-    public Book updateBook(String bookId, BookDto bookDto) {
-        if (bookDto  == null) throw new NullPointerException("Book cannot be null");
-        Book book = new Book();
+//    @Override
+//    public Book updateBook(String bookId, BookDto bookDto) {
+//        if (bookDto  == null) throw new NullPointerException("Book cannot be null");
+//        Book book = new Book();
 
 //        if (bookDto.getCoverImage() != null && !bookDto.getCoverImage().isEmpty()){
 //            try {
@@ -107,25 +109,25 @@ public class BookServiceImpl implements BookService{
 //           log.info("Exception occurred --> {}", err.getMessage());
 //           throw err;
 //       }
-        return null;
-    }
-
-    private String extractFileName(String filename){
-        return filename.split("\\.")[0];
-    }
-
-    @Override
-    public Book deleteBookById(String bookId) {
-        return null;
-    }
-
-    @Override
-    public List<Book> getBookByAuthorName(String authorName) {
-        return null;
-    }
-
-    @Override
-    public List<Book> getBookByCategory(String categoryName) {
-        return null;
-    }
+//        return null;
+//    }
+//
+//    private String extractFileName(String filename){
+//        return filename.split("\\.")[0];
+//    }
+//
+//    @Override
+//    public Book deleteBookById(String bookId) {
+//        return null;
+//    }
+//
+//    @Override
+//    public List<Book> getBookByAuthorName(String authorName) {
+//        return null;
+//    }
+//
+//    @Override
+//    public List<Book> getBookByCategory(String categoryName) {
+//        return null;
+//    }
 }

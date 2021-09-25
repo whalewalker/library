@@ -80,15 +80,15 @@ public class UserController {
         return new ResponseEntity<>(authors, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_USER')")
-    @PostMapping("/{userId}/books")
-    public ResponseEntity<?> uploadBook(@PathVariable String userId, @Valid @RequestBody BookDto bookDto){
-        try {
-            Book book = bookService.uploadBook(userId, bookDto);
-            return new ResponseEntity<>(book, HttpStatus.CREATED);
-        } catch (IOException | UserException e) {
-           return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
-    }
+//    @PreAuthorize("hasAnyRole('ROLE_USER')")
+//    @PostMapping("{userId}/books")
+//    public ResponseEntity<?> uploadBook(@PathVariable String userId, @Valid @RequestBody BookDto bookDto){
+//        try {
+//            Book book = bookService.uploadBook(userId, bookDto);
+//            return new ResponseEntity<>(book, HttpStatus.CREATED);
+//        } catch (IOException | UserException e) {
+//           return new ResponseEntity<>(new ApiResponse(false, e.getMessage()), HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
 }

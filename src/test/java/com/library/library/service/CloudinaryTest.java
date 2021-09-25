@@ -25,72 +25,72 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class CloudinaryTest {
 
-    @Autowired
-    CloudStorageService cloudStorageService;
-
-    @Test
-    void uploadImageMultipartFile() {
-        File file = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/me.jpeg");
-        assertThat(file.exists()).isTrue();
-        Map<Object, Object> params = new HashMap<>();
-
-        params.put("public_id", "library/user_file");
-        params.put("overwrite", true);
-
-        try {
-            cloudStorageService.uploadImage(file, params);
-        } catch (IOException e) {
-            log.info("Error occurred --> {}", e.getMessage());
-        }
-    }
-
-    @Test
-    @DisplayName("Upload multiple image test")
-    void uploadMultiPartImageTest() throws IOException {
-
-        Path path = Paths.get("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/me.jpeg");
-        MultipartFile multipartFile = new MockMultipartFile("author-image.jpeg", "author-image.jpeg", "img/jpeg", Files.readAllBytes(path));
-
-        log.info("Multipart Object created --> {}", multipartFile);
-        assertThat(multipartFile).isNotNull();
-
-        cloudStorageService.uploadImage(multipartFile, ObjectUtils.asMap(
-                "public_id", "libraryApp" + cloudStorageService.extractFileName(Objects.requireNonNull(multipartFile.getOriginalFilename()))
-        ));
-        assertThat(multipartFile.getOriginalFilename()).isEqualTo("author-image.jpeg");
-    }
-
-
-    @Test
-    void extractImageFromPdf() throws IOException {
-        File pdfFile = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/Spring Boot Up and Running Building Cloud Native Java and Kotlin Applications by Mark Heckler [Mark Heckler] (z-lib.org).pdf");
-        assertThat(pdfFile.exists()).isTrue();
-        assertThat(pdfFile.getName()).isEqualTo("Spring Boot Up and Running Building Cloud Native Java and Kotlin Applications by Mark Heckler [Mark Heckler] (z-lib.org).pdf");
-
-        cloudStorageService.extractCoverImage(pdfFile);
-        File extractedImage = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/Pdf.png");
-        assertThat(extractedImage.exists()).isTrue();
-        assertThat(extractedImage.getName()).isEqualTo("Pdf.png");
-    }
-
-    @Test
-    void uploadPdfToCloudinary(){
-        File pdfFile = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/Spring Boot Up and Running Building Cloud Native Java and Kotlin Applications by Mark Heckler [Mark Heckler] (z-lib.org).pdf");
-        assertThat(pdfFile.exists()).isTrue();
-        assertThat(pdfFile.getName()).isEqualTo("Spring Boot Up and Running Building Cloud Native Java and Kotlin Applications by Mark Heckler [Mark Heckler] (z-lib.org).pdf");
-
-        Map<Object, Object> params = new HashMap<>();
-        params.put("public_id", "books/pdf_file");
-        params.put("overwrite", true);
-        params.put("pages", true);
-        params.put("resource_type", "raw");
-
-
-        try {
-            Map<?, ?> pdfMap = cloudStorageService.uploadPdf(pdfFile, params);
-            log.info("Pdf return data ==> {}", pdfMap);
-        } catch (IOException e) {
-            log.info("Error occurred --> {}", e.getMessage());
-        }
-    }
+//    @Autowired
+//    CloudStorageService cloudStorageService;
+//
+//    @Test
+//    void uploadImageMultipartFile() {
+//        File file = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/me.jpeg");
+//        assertThat(file.exists()).isTrue();
+//        Map<Object, Object> params = new HashMap<>();
+//
+//        params.put("public_id", "library/user_file");
+//        params.put("overwrite", true);
+//
+//        try {
+//            cloudStorageService.uploadImage(file, params);
+//        } catch (IOException e) {
+//            log.info("Error occurred --> {}", e.getMessage());
+//        }
+//    }
+//
+//    @Test
+//    @DisplayName("Upload multiple image test")
+//    void uploadMultiPartImageTest() throws IOException {
+//
+//        Path path = Paths.get("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/me.jpeg");
+//        MultipartFile multipartFile = new MockMultipartFile("author-image.jpeg", "author-image.jpeg", "img/jpeg", Files.readAllBytes(path));
+//
+//        log.info("Multipart Object created --> {}", multipartFile);
+//        assertThat(multipartFile).isNotNull();
+//
+//        cloudStorageService.uploadImage(multipartFile, ObjectUtils.asMap(
+//                "public_id", "libraryApp" + cloudStorageService.extractFileName(Objects.requireNonNull(multipartFile.getOriginalFilename()))
+//        ));
+//        assertThat(multipartFile.getOriginalFilename()).isEqualTo("author-image.jpeg");
+//    }
+//
+//
+//    @Test
+//    void extractImageFromPdf() throws IOException {
+//        File pdfFile = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/Spring Boot Up and Running Building Cloud Native Java and Kotlin Applications by Mark Heckler [Mark Heckler] (z-lib.org).pdf");
+//        assertThat(pdfFile.exists()).isTrue();
+//        assertThat(pdfFile.getName()).isEqualTo("Spring Boot Up and Running Building Cloud Native Java and Kotlin Applications by Mark Heckler [Mark Heckler] (z-lib.org).pdf");
+//
+//        cloudStorageService.extractCoverImage(pdfFile);
+//        File extractedImage = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/Pdf.png");
+//        assertThat(extractedImage.exists()).isTrue();
+//        assertThat(extractedImage.getName()).isEqualTo("Pdf.png");
+//    }
+//
+//    @Test
+//    void uploadPdfToCloudinary(){
+//        File pdfFile = new File("/home/whalewalker/Whalewalker/Personal/library/src/main/resources/static/Spring Boot Up and Running Building Cloud Native Java and Kotlin Applications by Mark Heckler [Mark Heckler] (z-lib.org).pdf");
+//        assertThat(pdfFile.exists()).isTrue();
+//        assertThat(pdfFile.getName()).isEqualTo("Spring Boot Up and Running Building Cloud Native Java and Kotlin Applications by Mark Heckler [Mark Heckler] (z-lib.org).pdf");
+//
+//        Map<Object, Object> params = new HashMap<>();
+//        params.put("public_id", "books/pdf_file");
+//        params.put("overwrite", true);
+//        params.put("pages", true);
+//        params.put("resource_type", "raw");
+//
+//
+//        try {
+//            Map<?, ?> pdfMap = cloudStorageService.uploadPdf(pdfFile, params);
+//            log.info("Pdf return data ==> {}", pdfMap);
+//        } catch (IOException e) {
+//            log.info("Error occurred --> {}", e.getMessage());
+//        }
+//    }
 }
